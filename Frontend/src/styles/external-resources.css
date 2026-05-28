@@ -1,0 +1,324 @@
+.ext-resources-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  background: white;
+  border-radius: var(--radius-md);
+  min-height: 280px;
+}
+
+.ext-resources-state--error {
+  color: #991b1b;
+}
+
+.ext-resources-state__hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 420px;
+}
+
+.ext-resources-state__icon.spin {
+  animation: ext-spin 1s linear infinite;
+  color: var(--accent-color);
+}
+
+@keyframes ext-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ext-resources-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.ext-resources-search {
+  position: relative;
+  flex: 2 1 220px;
+}
+
+.ext-resources-search .form-input {
+  padding-left: 2.5rem;
+  margin-bottom: 0;
+}
+
+.ext-resources-search__icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.ext-resources-select {
+  flex: 0 1 180px;
+  margin-bottom: 0;
+}
+
+.ext-resources-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.ext-resources-count {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.ext-resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.ext-resources-grid--large {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.ext-resources-grid--large .ext-resource-card {
+  max-width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .ext-resources-grid--large {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ext-resources-grid--large {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ext-resources-grid--large .ext-resource-card__image-wrap {
+  aspect-ratio: 16 / 11;
+}
+
+.ext-resource-card {
+  background: white;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.ext-resource-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  border-color: var(--accent-color);
+}
+
+.ext-resource-card__image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #f0ece7;
+}
+
+.ext-resource-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ext-resource-card__badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.65rem;
+  border-radius: 100px;
+}
+
+.ext-resource-card__badge.is-available {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.ext-resource-card__badge.is-unavailable {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.ext-resource-card__body {
+  padding: 1.25rem;
+}
+
+.ext-resource-card__type {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-color);
+}
+
+.ext-resource-card__title {
+  font-size: 1.2rem;
+  margin: 0.35rem 0 0.5rem;
+  line-height: 1.25;
+}
+
+.ext-resource-card__location {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.ext-resource-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.85rem;
+}
+
+.ext-resource-card__book {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
+
+.ext-resource-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Category advertising cards (Catalog) */
+.category-ads {
+  margin-bottom: 2.5rem;
+}
+
+.category-ads__header {
+  margin-bottom: 1.25rem;
+}
+
+.category-ads__title {
+  font-size: 1.75rem;
+}
+
+.category-ads__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.category-ad-card {
+  text-align: left;
+  padding: 1.25rem 1rem;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background: linear-gradient(145deg, #fff 0%, #f8f5f1 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.category-ad-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--ad-accent, var(--accent-color));
+}
+
+.category-ad-card:hover,
+.category-ad-card.is-active {
+  transform: translateY(-4px);
+  border-color: var(--ad-accent, var(--accent-color));
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1);
+}
+
+.category-ad-card.is-active {
+  background: linear-gradient(145deg, #fff 0%, #fdf9f4 100%);
+}
+
+.category-ad-card__count {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: var(--font-heading);
+  color: var(--ad-accent, var(--primary-color));
+  line-height: 1;
+}
+
+.category-ad-card__label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  color: var(--primary-color);
+  line-height: 1.2;
+}
+
+.category-ad-card__tagline {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+.category-ad-card__cta {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.75rem;
+  color: var(--accent-color);
+}
+
+.campus-booking-section {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 2px solid var(--accent-color);
+}
+
+.campus-booking-section__title {
+  font-size: 1.25rem;
+}
+
+.campus-booking-section__sub {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.ext-resources-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
