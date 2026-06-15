@@ -32,7 +32,7 @@ const Home = () => {
                 }}
                 className="btn-trigger-action"
               >
-                Begin Bookings
+                {loggedIn ? 'Begin Bookings' : 'Log In'}
               </button>
             </div>
           </div>

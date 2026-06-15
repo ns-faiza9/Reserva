@@ -1,33 +1,26 @@
-/**
- * GitHub blob URLs cannot be fetched directly — use raw.githubusercontent.com
- * @see https://raw.githubusercontent.com/ns-faiza9/Booking-api-data/main/resources.json
- */
-export const GITHUB_RESOURCES_URL =
-  'https://raw.githubusercontent.com/ns-faiza9/Booking-api-data/main/resources.json';
+import { fetchResources } from '../utils/api';
 
 /**
- * @returns {Promise<import('../types/externalResource').ExternalResource[]>}
+ * Fetch resources from the local JWT FastAPI server running on port 8080.
  */
 export async function fetchGithubResources() {
-  const response = await fetch(GITHUB_RESOURCES_URL, {
-    headers: { Accept: 'application/json' },
-  });
+  try {
+    const data = await fetchResources();
 
-  if (!response.ok) {
-    throw new Error(`Failed to load resources (${response.status})`);
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid JSON: expected an array of resources');
+    }
+
+    return data.filter(
+      (item) =>
+        item &&
+        typeof item.id === 'number' &&
+        typeof item.name === 'string' &&
+        typeof item.type === 'string'
+    );
+  } catch (error) {
+    throw new Error(`Failed to load resources: ${error.message}`, { cause: error });
   }
-
-  const data = await response.json();
-
-  if (!Array.isArray(data)) {
-    throw new Error('Invalid JSON: expected an array of resources');
-  }
-
-  return data.filter(
-    (item) =>
-      item &&
-      typeof item.id === 'number' &&
-      typeof item.name === 'string' &&
-      typeof item.type === 'string'
-  );
 }
+
+

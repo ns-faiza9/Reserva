@@ -8,6 +8,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <div id="error-overlay" style="color:red; font-family:monospace; padding:20px; white-space:pre-wrap; z-index:9999; position:absolute; top:0; left:0;"></div>
+    <script>
+      window.onerror = function(msg, src, lineno, colno, error) {
+        document.getElementById('error-overlay').innerText += '\n' + msg + '\n' + (error ? error.stack : '');
+      };
+      window.addEventListener('unhandledrejection', function(event) {
+        document.getElementById('error-overlay').innerText += '\nUnhandled Promise Rejection: ' + event.reason;
+      });
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

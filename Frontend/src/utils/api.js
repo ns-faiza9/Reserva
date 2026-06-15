@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const api = axios.create({ baseURL: `${API_BASE}/api`, headers: { 'Content-Type': 'application/json' } });
 const authApi = axios.create({ baseURL: API_BASE, headers: { 'Content-Type': 'application/json' } });
 
@@ -9,6 +9,17 @@ api.interceptors.request.use((config) => {
   if (token) config.headers.Token = token;
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      clearAuth();
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const getToken = () => localStorage.getItem('jwt');
 export const setToken = (token) => localStorage.setItem('jwt', token);

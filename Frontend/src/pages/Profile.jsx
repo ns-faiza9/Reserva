@@ -24,7 +24,10 @@ const Profile = () => {
     return null;
   }
 
-  const roleLabel = user.role === 2 ? 'Administrator' : 'User';
+  const fullName = user.fullname || user.name || user.username || '—';
+  const phone = user.phone || '—';
+  const roleLabel = user.roleName || (user.role === 2 ? 'Administrator' : 'User');
+  const statusLabel = user.statusText || (user.status === 0 ? 'Inactive' : 'Active');
 
   return (
     <div className="page-shell">
@@ -36,7 +39,7 @@ const Profile = () => {
 
           <div className="profile-row">
             <span className="profile-label">Full name</span>
-            <span>{user.fullname || '—'}</span>
+            <span>{fullName}</span>
           </div>
           <div className="profile-row">
             <span className="profile-label">Email</span>
@@ -44,7 +47,7 @@ const Profile = () => {
           </div>
           <div className="profile-row">
             <span className="profile-label">Phone</span>
-            <span>{user.phone || '—'}</span>
+            <span>{phone}</span>
           </div>
           <div className="profile-row">
             <span className="profile-label">Role</span>
@@ -52,7 +55,7 @@ const Profile = () => {
           </div>
           <div className="profile-row" style={{ borderBottom: 'none' }}>
             <span className="profile-label">Status</span>
-            <span>{user.status === 1 ? 'Active' : 'Inactive'}</span>
+            <span>{statusLabel}</span>
           </div>
         </div>
       </div>

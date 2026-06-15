@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { createBooking, ensureCatalogResource } from '../utils/api';
 import { isAuthenticated } from '../utils/auth';
 
@@ -10,6 +11,7 @@ export function useBookResource() {
 
   const handleBookExternal = async (external) => {
     if (!isAuthenticated()) {
+      toast.error("Login required to make a reservation.");
       navigate('/login');
       return;
     }
@@ -24,7 +26,7 @@ export function useBookResource() {
       });
       setSelectedResource(dbResource);
     } catch {
-      alert('Could not start booking. Please sign in and try again in a moment.');
+      toast.error('Could not start booking. Please sign in and try again in a moment.');
     } finally {
       setResolving(false);
     }
@@ -34,10 +36,11 @@ export function useBookResource() {
     try {
       await createBooking(details);
       setSelectedResource(null);
+      toast.success('Booking created successfully!');
       navigate('/bookings');
     } catch (err) {
-      const msg = err.response?.data?.message;
-      alert(
+      const msg = err.response?.data?.detail || err.response?.data?.message;
+      toast.error(
         msg && !msg.includes('could not execute statement')
           ? msg
           : 'Booking could not be completed. Please try again.'

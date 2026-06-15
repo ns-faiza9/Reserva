@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -27,15 +28,16 @@ const Bookings = () => {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { queueMicrotask(() => load()); }, []);
 
   const removeBooking = async (id) => {
     if (!window.confirm('Cancel this booking?')) return;
     try {
       await cancelBooking(id);
+      toast.success('Booking cancelled');
       load();
     } catch (err) {
-      alert(err.response?.data?.message || 'Could not cancel.');
+      toast.error(err.response?.data?.message || 'Could not cancel.');
     }
   };
 

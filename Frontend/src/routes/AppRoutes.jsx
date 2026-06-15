@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { isAuthenticated, isAdmin } from '../utils/auth';
 import Login from '../pages/Login';
 import Signup from '../pages/Signup';
@@ -19,7 +21,11 @@ const PageWrapper = ({ children }) => (
 );
 
 const ProtectedRoute = () => {
-  if (!isAuthenticated()) return <Navigate to="/login" replace />;
+  const auth = isAuthenticated();
+  useEffect(() => {
+    if (!auth) toast.error('Please login to continue.', { id: 'auth-req' });
+  }, [auth]);
+  if (!auth) return <Navigate to="/login" replace />;
   return <Outlet />;
 };
 
@@ -31,10 +37,12 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
         <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
         <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
+        <Route path="/resources" element={<PageWrapper><Resources /></PageWrapper>} />
         <Route element={<ProtectedRoute />}>
-          <Route path="/resources" element={<PageWrapper><Resources /></PageWrapper>} />
           <Route path="/bookings" element={<PageWrapper><Bookings /></PageWrapper>} />
+          <Route path="/my-bookings" element={<Navigate to="/bookings" replace />} />
           <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+          <Route path="/dashboard" element={<Navigate to="/profile" replace />} />
           <Route path="/admin" element={<PageWrapper>{isAdmin() ? <AdminResources /> : <Navigate to="/resources" replace />}</PageWrapper>} />
         </Route>
         <Route path="/catalog" element={<PageWrapper><Catalog /></PageWrapper>} />

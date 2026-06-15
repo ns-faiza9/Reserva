@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { login } from '../utils/auth';
 
 const Login = () => {
@@ -8,16 +9,24 @@ const Login = () => {
     const location = useLocation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const fromLogout = location.state?.fromLogout;
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const user = await login(email, password);
-            if (user) navigate('/resources');
-            else alert('Invalid email or password.');
-        } catch {
-            alert('We could not reach the server. Please try again shortly.');
+            if (user) {
+                toast.success('Login successful');
+                navigate('/');
+            } else {
+                toast.error('Invalid email or password.');
+            }
+        } catch (err) {
+            toast.error(err.message || 'We could not reach the server. Please try again shortly.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -99,6 +108,7 @@ const Login = () => {
                     <button
                         type="submit"
                         className="btn-hero"
+                        disabled={loading}
                         style={{
                             width: '100%',
                             background: 'var(--primary-color)',
@@ -107,16 +117,18 @@ const Login = () => {
                             padding: '1.2rem',
                             borderRadius: '12px',
                             fontWeight: 700,
-                            fontSize: '1rem'
+                            fontSize: '1rem',
+                            opacity: loading ? 0.7 : 1,
+                            cursor: loading ? 'not-allowed' : 'pointer'
                         }}
                     >
-                        Log In
+                        {loading ? 'Logging In...' : 'Log In'}
                     </button>
                 </form>
 
                 <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.9rem' }}>
                     <p style={{ color: 'var(--text-muted)' }}>
-                        New user? <a href="/signup" style={{ color: 'var(--accent-color)', fontWeight: 700, textDecoration: 'none' }}>Sign up</a>
+                        New user? <Link to="/signup" style={{ color: 'var(--accent-color)', fontWeight: 700, textDecoration: 'none' }}>Sign up</Link>
                     </p>
                 </div>
             </motion.div>

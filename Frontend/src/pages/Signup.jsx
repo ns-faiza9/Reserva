@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { signup } from '../utils/auth';
 
 const Signup = () => {
@@ -10,22 +11,32 @@ const Signup = () => {
         gender: '',
         email: '',
         username: '',
+        role: 'USER',
         password: '',
         confirmPassword: ''
     });
 
+    const [loading, setLoading] = useState(false);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match");
+        if (formData.password.length < 8) {
+            toast.error("Password must be at least 8 characters long");
             return;
         }
+        if (formData.password !== formData.confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+        setLoading(true);
         try {
             await signup(formData);
-            alert("Account created. Please login.");
+            toast.success("Account created successfully. Please login.");
             navigate('/login');
         } catch (err) {
-            alert(err.message || 'Signup failed');
+            toast.error(err.message || 'Signup failed');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -74,6 +85,14 @@ const Signup = () => {
                         <input name="username" type="text" className="form-input" placeholder="wade08" onChange={handleChange} required />
                     </div>
 
+                    <div className="form-group">
+                        <label className="form-label">Account Role</label>
+                        <select name="role" className="form-input" value={formData.role} onChange={handleChange} required>
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                    </div>
+
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <div className="form-group">
                             <label className="form-label">Password</label>
@@ -88,9 +107,10 @@ const Signup = () => {
                     <button
                         type="submit"
                         className="btn-hero"
-                        style={{ width: '100%', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: 'pointer', marginTop: '1rem', borderRadius: '12px' }}
+                        disabled={loading}
+                        style={{ width: '100%', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', marginTop: '1rem', borderRadius: '12px', opacity: loading ? 0.7 : 1, padding: '1rem', fontWeight: 700 }}
                     >
-                        Establish Identity
+                        {loading ? 'Establishing Identity...' : 'Establish Identity'}
                     </button>
                 </form>
 

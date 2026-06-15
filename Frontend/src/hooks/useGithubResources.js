@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchGithubResources } from '../api/githubResources';
+import { semanticSearch } from '../utils/api';
 
 const PAGE_SIZE = 24;
 
@@ -11,8 +12,9 @@ export function useGithubResources() {
   const [typeFilter, setTypeFilter] = useState('');
   const [availableOnly, setAvailableOnly] = useState(false);
   const [page, setPage] = useState(1);
+  const [semanticResults, setSemanticResults] = useState(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -24,11 +26,30 @@ export function useGithubResources() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    load();
-  }, []);
+    queueMicrotask(() => load());
+  }, [load]);
+
+  useEffect(() => {
+    const q = search.trim();
+    if (!q) {
+      queueMicrotask(() => setSemanticResults(null));
+      return undefined;
+    }
+
+    const timeout = setTimeout(async () => {
+      try {
+        const results = await semanticSearch(q, undefined, availableOnly);
+        setSemanticResults(Array.isArray(results) ? results : null);
+      } catch {
+        setSemanticResults(null);
+      }
+    }, 250);
+
+    return () => clearTimeout(timeout);
+  }, [search, availableOnly]);
 
   const types = useMemo(
     () => [...new Set(resources.map((r) => r.type))].sort(),
@@ -37,9 +58,11 @@ export function useGithubResources() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return resources.filter((r) => {
+    const source = semanticResults || resources;
+    return source.filter((r) => {
       if (availableOnly && !r.available) return false;
       if (typeFilter && r.type !== typeFilter) return false;
+      if (semanticResults) return true;
       if (!q) return true;
       return (
         r.name.toLowerCase().includes(q) ||
@@ -47,18 +70,18 @@ export function useGithubResources() {
         r.location.toLowerCase().includes(q)
       );
     });
-  }, [resources, search, typeFilter, availableOnly]);
+  }, [resources, semanticResults, search, typeFilter, availableOnly]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const setTypeFilterAndReset = (type) => {
+  const setTypeFilterAndReset = useCallback((type) => {
     setTypeFilter(type);
     setPage(1);
-  };
+  }, []);
 
   useEffect(() => {
-    setPage(1);
+    queueMicrotask(() => setPage(1));
   }, [search, typeFilter, availableOnly]);
 
   return {

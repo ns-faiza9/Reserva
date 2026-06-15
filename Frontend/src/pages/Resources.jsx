@@ -10,11 +10,12 @@ import '../styles/external-resources.css';
 const Resources = () => {
   const location = useLocation();
   const github = useGithubResources();
+  const { setTypeFilterAndReset } = github;
 
   useEffect(() => {
     const type = location.state?.typeFilter;
-    if (type) github.setTypeFilterAndReset(type);
-  }, [location.state?.typeFilter]);
+    if (type) setTypeFilterAndReset(type);
+  }, [location.state?.typeFilter, setTypeFilterAndReset]);
   const {
     selectedResource,
     setSelectedResource,

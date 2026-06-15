@@ -2,6 +2,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { User, LogOut } from 'lucide-react';
 import { isAuthenticated, isAdmin, logout } from '../utils/auth';
 
+import toast from 'react-hot-toast';
+
 const linkStyle = ({ isActive }) => ({
   color: isActive ? 'var(--primary-color)' : '#666',
   fontWeight: isActive ? 800 : 500,
@@ -26,7 +28,7 @@ const Navbar = () => {
       <div className="nav-links">
         <NavLink to="/catalog" className="nav-link" style={linkStyle}>Catalog</NavLink>
         <NavLink to="/resources" className="nav-link" style={linkStyle}>Explore</NavLink>
-        {loggedIn && <NavLink to="/bookings" className="nav-link" style={linkStyle}>Bookings</NavLink>}
+        <NavLink to="/bookings" className="nav-link" style={linkStyle}>Bookings</NavLink>
         {loggedIn && isAdmin() && <NavLink to="/admin" className="nav-link" style={linkStyle}>Admin</NavLink>}
         <NavLink to="/about" className="nav-link" style={linkStyle}>About</NavLink>
         <NavLink to="/contact-us" className="nav-link" style={linkStyle}>Contact</NavLink>
@@ -38,12 +40,15 @@ const Navbar = () => {
             <NavLink to="/profile" style={linkStyle} title="Profile">
               <div className="nav-avatar"><User size={18} /></div>
             </NavLink>
-            <button type="button" className="btn-nav-logout" onClick={() => { logout(); navigate('/login', { state: { fromLogout: true } }); }}>
+            <button type="button" className="btn-nav-logout" onClick={() => { logout(); toast.success('Logged out successfully'); navigate('/'); }}>
               <LogOut size={16} /> Log Out
             </button>
           </>
         ) : (
-          <button type="button" className="btn-nav-login" onClick={() => navigate('/login')}>Log In</button>
+          <>
+            <div className="nav-avatar" onClick={() => navigate('/login')} style={{cursor: 'pointer'}} title="Login"><User size={18} /></div>
+            <button type="button" className="btn-nav-login" onClick={() => navigate('/login')}>Log In</button>
+          </>
         )}
       </div>
     </nav>

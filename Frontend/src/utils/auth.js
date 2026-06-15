@@ -4,8 +4,10 @@ export const signup = async (formData) => {
   const res = await signupApi({
     fullname: formData.name || formData.fullname,
     email: formData.email,
+    username: formData.username,
     password: formData.password,
     phone: formData.phone || formData.username || '',
+    role: formData.role || 'USER',
   });
   if (res.code !== 200) throw new Error(res.message || 'Signup failed');
   return res;
@@ -13,7 +15,7 @@ export const signup = async (formData) => {
 
 export const login = async (email, password) => {
   const res = await signinApi(email, password);
-  if (res.code !== 200) return null;
+  if (res.code !== 200) throw new Error(res.message || 'Invalid email or password.');
   setToken(res.jwt);
   const info = await fetchUserInfo();
   if (info.code === 200) {
