@@ -1,35 +1,48 @@
 package mth;
 
 import mth.dto.BookingRequest;
-import mth.entity.Resource;
-import mth.repository.ResourceRepository;
+import mth.entity.Booking;
 import mth.services.BookingService;
+import mth.repository.BookingRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
 
-    @Autowired BookingService bookingService;
-    @Autowired ResourceRepository resourceRepository;
+    @InjectMocks
+    private BookingService bookingService;
+
+    @Mock
+    private BookingRepository bookingRepository;
 
     @Test
     void overlappingBookingThrowsConflict() {
-        Resource r = new Resource();
-        r.setName("Test Room"); r.setType("Room"); r.setCapacity(5); r.setLocation("A");
-        r = resourceRepository.save(r);
+        AtomicReference<Booking> savedBooking = new AtomicReference<>();
+        when(bookingRepository.findActiveByResourceId(42L)).thenAnswer(invocation ->
+                savedBooking.get() == null ? List.of() : List.of(savedBooking.get()));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
+            Booking booking = invocation.getArgument(0);
+            booking.setId(1L);
+            savedBooking.set(booking);
+            return booking;
+        });
 
         LocalDate day = LocalDate.now().plusDays(1);
         BookingRequest req = new BookingRequest();
-        req.setResourceId(r.getId());
+        req.setResourceId(42L);
         req.setFromDate(day);
         req.setToDate(day);
         req.setFromTime(LocalTime.of(9, 0));
@@ -39,7 +52,7 @@ class BookingServiceTest {
         bookingService.createBooking(req, "test@reserva.com");
 
         BookingRequest overlap = new BookingRequest();
-        overlap.setResourceId(r.getId());
+        overlap.setResourceId(42L);
         overlap.setFromDate(day);
         overlap.setToDate(day);
         overlap.setFromTime(LocalTime.of(10, 0));

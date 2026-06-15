@@ -23,6 +23,8 @@ export function useBookResource() {
         type: external.type,
         location: external.location,
         capacity: external.capacity,
+        price_per_hour: external.price_per_hour,
+        image: external.image,
       });
       setSelectedResource(dbResource);
     } catch {

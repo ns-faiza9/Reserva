@@ -9,11 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/reservaDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+mongoose.set('bufferCommands', false);
+mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/reservaDB', {
+  serverSelectionTimeoutMS: 3000
 }).then(() => console.log('MongoDB Connected'))
   .catch(err => console.log('MongoDB connection error:', err));
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    mongo: mongoose.connection.readyState === 1 ? 'connected' : 'fallback'
+  });
+});
 
 app.use('/api/resources', resourceRoutes);
 

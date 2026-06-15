@@ -1,6 +1,6 @@
 import httpx
 from fastapi import FastAPI, Request, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 import os
@@ -19,10 +19,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SPRING_BOOT_URL = os.getenv("SPRING_BOOT_URL", "http://localhost:8080")
-NODE_JS_URL = os.getenv("NODE_JS_URL", "http://localhost:3000")
-
+SPRING_BOOT_URL = os.getenv("SPRING_BOOT_URL", "http://127.0.0.1:8080")
+NODE_JS_URL = os.getenv("NODE_JS_URL", "http://127.0.0.1:3000")
 client = httpx.AsyncClient(timeout=30.0)
+
+def model_to_json_bytes(model: BaseModel) -> bytes:
+    if hasattr(model, "model_dump_json"):
+        return model.model_dump_json().encode()
+    return model.json().encode()
 
 # Validation Schemas
 class LoginRequest(BaseModel):
@@ -51,12 +55,15 @@ class CatalogResourceRequest(BaseModel):
     type: str
     location: str
     capacity: int
+    price_per_hour: int | float | None = 0
+    image: str | None = ""
 
 async def proxy_request(request: Request, target_url: str, body_bytes: bytes = None):
     try:
         body = body_bytes if body_bytes is not None else await request.body()
         headers = dict(request.headers)
         headers.pop("host", None)
+        headers.pop("content-length", None)
 
         response = await client.request(
             method=request.method,
@@ -65,10 +72,26 @@ async def proxy_request(request: Request, target_url: str, body_bytes: bytes = N
             params=request.query_params,
             content=body
         )
-        return JSONResponse(
+        excluded_headers = {"content-length", "transfer-encoding", "connection"}
+        response_headers = {
+            key: value
+            for key, value in response.headers.items()
+            if key.lower() not in excluded_headers
+        }
+        content_type = response.headers.get("content-type", "")
+
+        if "application/json" in content_type and response.content:
+            return JSONResponse(
+                status_code=response.status_code,
+                content=response.json(),
+                headers=response_headers,
+            )
+
+        return Response(
             status_code=response.status_code,
-            content=response.json() if response.content else None,
-            headers={k: v for k, v in response.headers.items() if k.lower() != 'content-length'}
+            content=response.content,
+            media_type=content_type.split(";")[0] if content_type else None,
+            headers=response_headers,
         )
     except httpx.RequestError as exc:
         raise HTTPException(
@@ -81,11 +104,11 @@ async def proxy_request(request: Request, target_url: str, body_bytes: bytes = N
 # --- Spring Boot Routes ---
 @app.post("/authservice/signin")
 async def signin(request: Request, data: LoginRequest):
-    return await proxy_request(request, f"{SPRING_BOOT_URL}/authservice/signin", data.model_dump_json().encode())
+    return await proxy_request(request, f"{SPRING_BOOT_URL}/authservice/signin", model_to_json_bytes(data))
 
 @app.post("/authservice/signup")
 async def signup(request: Request, data: SignupRequest):
-    return await proxy_request(request, f"{SPRING_BOOT_URL}/authservice/signup", data.model_dump_json().encode())
+    return await proxy_request(request, f"{SPRING_BOOT_URL}/authservice/signup", model_to_json_bytes(data))
 
 @app.get("/authservice/uinfo")
 async def get_uinfo(request: Request):
@@ -93,7 +116,7 @@ async def get_uinfo(request: Request):
 
 @app.post("/api/bookings")
 async def create_booking(request: Request, data: BookingRequest):
-    return await proxy_request(request, f"{SPRING_BOOT_URL}/api/bookings", data.model_dump_json().encode())
+    return await proxy_request(request, f"{SPRING_BOOT_URL}/api/bookings", model_to_json_bytes(data))
 
 @app.get("/api/bookings")
 async def get_bookings(request: Request):
@@ -122,7 +145,7 @@ async def recommendations(request: Request):
 
 @app.post("/api/resources/from-catalog")
 async def ensure_catalog_resource(request: Request, data: CatalogResourceRequest):
-    return await proxy_request(request, f"{NODE_JS_URL}/api/resources/from-catalog", data.model_dump_json().encode())
+    return await proxy_request(request, f"{NODE_JS_URL}/api/resources/from-catalog", model_to_json_bytes(data))
 
 @app.post("/api/resources")
 async def create_resource(request: Request):

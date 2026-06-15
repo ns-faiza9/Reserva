@@ -35,15 +35,25 @@ public class UsersService {
 
     public Map<String, Object> signin(Map<String, Object> data) {
         Map<String, Object> response = new HashMap<>();
+        Object usernameValue = data.get("username") != null ? data.get("username") : data.get("email");
+        Object passwordValue = data.get("password");
+
+        if (usernameValue == null || passwordValue == null) {
+            response.put("code", 400);
+            response.put("message", "Username/email and password are required");
+            return response;
+        }
+
+        String username = usernameValue.toString();
         Object role = usersRepository.validateCredentials(
-                data.get("username").toString(), data.get("password").toString());
+                username, passwordValue.toString());
         if (role == null) {
             response.put("code", 404);
             response.put("message", "Invalid credentials");
             return response;
         }
         response.put("code", 200);
-        response.put("jwt", jwtService.generateJWT(data.get("username"), role));
+        response.put("jwt", jwtService.generateJWT(username, role));
         return response;
     }
 
