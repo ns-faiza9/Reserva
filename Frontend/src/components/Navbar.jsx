@@ -4,6 +4,8 @@ import { isAuthenticated, isAdmin, logout } from '../utils/auth';
 
 import toast from 'react-hot-toast';
 
+const logoUrl = `${import.meta.env.BASE_URL}reserva-logo.png`;
+
 const linkStyle = ({ isActive }) => ({
   color: isActive ? 'var(--primary-color)' : '#666',
   fontWeight: isActive ? 800 : 500,
@@ -20,7 +22,7 @@ const Navbar = () => {
       <div className="logo brand-logo-link" onClick={() => navigate('/')} role="button" tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && navigate('/')}>
         <span className="brand-logo-wrap">
-          <img src="/reserva-logo.png" alt="" className="brand-logo" />
+          <img src={logoUrl} alt="" className="brand-logo" />
         </span>
         <span className="brand-name">Reserva</span>
       </div>

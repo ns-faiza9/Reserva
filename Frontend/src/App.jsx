@@ -40,7 +40,7 @@ function App() {
   if (isChecking) return null; // Or a minimal loading spinner
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Toaster 
         position="top-right" 
         toastOptions={{
