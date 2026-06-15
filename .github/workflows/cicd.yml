@@ -30,6 +30,9 @@ jobs:
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Install frontend dependencies
         working-directory: Frontend
         run: npm ci
