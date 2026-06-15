@@ -5,6 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 import os
 
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "https://ns-faiza9.github.io,http://localhost:5173,http://127.0.0.1:5173",
+    ).split(",")
+    if origin.strip()
+]
+
 app = FastAPI(
     title="Reserva API Gateway",
     description="API Gateway proxying to Spring Boot and Node.js with validation",
@@ -13,7 +22,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -164,6 +173,10 @@ async def get_time_slots(request: Request):
     # Wait, time-slots require DB conflict checks with bookings. 
     # Spring Boot handles bookings. So time-slots should go to Spring Boot.
     return await proxy_request(request, f"{SPRING_BOOT_URL}/api/time-slots")
+
+@app.options("/{path:path}")
+async def options_handler(path: str):
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 # Catch-all
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
