@@ -39,6 +39,8 @@ jobs:
 
       - name: Build frontend
         working-directory: Frontend
+        env:
+          VITE_RESOURCE_API_URL: https://reserva-gateway.onrender.com
         run: npm run build
 
       - name: Add 404 fallback
