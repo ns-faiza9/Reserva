@@ -1,5 +1,22 @@
+from fastapi import FastAPI, Depends, Request, HTTPException
 from pydantic import BaseModel
 from bson import ObjectId
+import pymongo
+import os
+
+app = FastAPI()
+
+mongo_uri = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017/")
+client = pymongo.MongoClient(mongo_uri)
+db = client["reservaDB"]
+resources_collection = db["resources"]
+
+def verify_token(request: Request) -> dict:
+    token = request.headers.get("Token")
+    if not token:
+        raise HTTPException(status_code=401, detail="Token missing")
+    # Stub for token decoding. You can implement proper JWT decoding here.
+    return {"sub": "user@example.com"}
 
 class CatalogResourceRequest(BaseModel):
     catalogId: int
@@ -84,7 +101,7 @@ def get_bookings(payload: dict = Depends(verify_token)):
         try:
             rid = int(rid)
             r = resources_collection.find_one({"id": rid})
-        except:
+        except (ValueError, TypeError):
             if ObjectId.is_valid(rid):
                 r = resources_collection.find_one({"_id": ObjectId(rid)})
             else:
