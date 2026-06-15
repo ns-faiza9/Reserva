@@ -15,9 +15,8 @@ public class Booking {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resource_id", nullable = false)
-    private Resource resource;
+    @Column(name = "resource_id", nullable = false)
+    private Long resourceId;
 
     /** Legacy predefined slot; optional when using from/to date & time */
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,14 +44,20 @@ public class Booking {
     @Column(length = 500)
     private String purpose;
 
+    @Column(name = "resource_name")
+    private String resourceName;
+
+    @Column(name = "resource_location")
+    private String resourceLocation;
+
     public Booking() {}
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
-    public Resource getResource() { return resource; }
-    public void setResource(Resource resource) { this.resource = resource; }
+    public Long getResourceId() { return resourceId; }
+    public void setResourceId(Long resourceId) { this.resourceId = resourceId; }
     public TimeSlot getTimeSlot() { return timeSlot; }
     public void setTimeSlot(TimeSlot timeSlot) { this.timeSlot = timeSlot; }
     public LocalDate getBookingDate() { return bookingDate; }
@@ -69,4 +74,8 @@ public class Booking {
     public void setStatus(String status) { this.status = status; }
     public String getPurpose() { return purpose; }
     public void setPurpose(String purpose) { this.purpose = purpose; }
+    public String getResourceName() { return resourceName; }
+    public void setResourceName(String resourceName) { this.resourceName = resourceName; }
+    public String getResourceLocation() { return resourceLocation; }
+    public void setResourceLocation(String resourceLocation) { this.resourceLocation = resourceLocation; }
 }

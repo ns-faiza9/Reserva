@@ -15,6 +15,8 @@ public class BookingRequest {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime toTime;
     private String purpose;
+    private String resourceName;
+    private String resourceLocation;
 
     public BookingRequest() {}
 
@@ -32,4 +34,8 @@ public class BookingRequest {
     public void setToTime(LocalTime toTime) { this.toTime = toTime; }
     public String getPurpose() { return purpose; }
     public void setPurpose(String purpose) { this.purpose = purpose; }
+    public String getResourceName() { return resourceName; }
+    public void setResourceName(String resourceName) { this.resourceName = resourceName; }
+    public String getResourceLocation() { return resourceLocation; }
+    public void setResourceLocation(String resourceLocation) { this.resourceLocation = resourceLocation; }
 }

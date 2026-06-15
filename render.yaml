@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: reserva-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    rootDir: Frontend
+
+  - type: web
+    name: reserva-gateway
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: resource-api
+    envVars:
+      - key: SPRING_BOOT_URL
+        value: https://reserva-spring-boot.onrender.com
+      - key: NODE_JS_URL
+        value: https://reserva-node-service.onrender.com
+
+  - type: web
+    name: reserva-node-service
+    env: node
+    buildCommand: npm install
+    startCommand: node index.js
+    rootDir: Backend/node-service
+    envVars:
+      - key: MONGO_URI
+        sync: false
+
+  - type: web
+    name: reserva-spring-boot
+    env: docker
+    rootDir: Backend/coreservices
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false

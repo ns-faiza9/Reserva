@@ -29,4 +29,9 @@ public class UsersController {
     public Map<String, Object> uinfo(@RequestHeader("Token") String token) {
         return usersService.uinfo(token);
     }
+
+    @PostMapping("/logout")
+    public Map<String, Object> logout(@RequestHeader("Token") String token) {
+        return usersService.logout(token);
+    }
 }

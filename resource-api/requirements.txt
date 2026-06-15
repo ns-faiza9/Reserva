@@ -1,7 +1,5 @@
 fastapi
 uvicorn
 pydantic
-pymongo[srv]
-python-jose[cryptography]
-passlib[bcrypt]
+httpx
 python-multipart

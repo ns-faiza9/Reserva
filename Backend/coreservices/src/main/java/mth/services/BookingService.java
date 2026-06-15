@@ -3,9 +3,7 @@ package mth.services;
 import mth.dto.BookingRequest;
 import mth.dto.BookingResponse;
 import mth.entity.Booking;
-import mth.entity.Resource;
 import mth.repository.BookingRepository;
-import mth.repository.ResourceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,13 +19,9 @@ public class BookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
-    @Autowired
-    private ResourceRepository resourceRepository;
 
     @Transactional
     public BookingResponse createBooking(BookingRequest request, String userId) {
-        Resource resource = resourceRepository.findById(request.getResourceId())
-                .orElseThrow(() -> new RuntimeException("Resource not found."));
 
         LocalDate fromDate = request.getFromDate();
         LocalDate toDate = request.getToDate();
@@ -44,13 +38,15 @@ public class BookingService {
             throw new RuntimeException("'To' must be after 'From'.");
         }
 
-        if (hasOverlap(resource.getId(), rangeStart, rangeEnd, null)) {
+        if (hasOverlap(request.getResourceId(), rangeStart, rangeEnd, null)) {
             throw new RuntimeException("Resource is already booked for this period.");
         }
 
         Booking booking = new Booking();
         booking.setUserId(userId);
-        booking.setResource(resource);
+        booking.setResourceId(request.getResourceId());
+        booking.setResourceName(request.getResourceName() != null ? request.getResourceName() : "Unknown");
+        booking.setResourceLocation(request.getResourceLocation() != null ? request.getResourceLocation() : "Unknown");
         booking.setTimeSlot(null);
         booking.setFromDate(fromDate);
         booking.setToDate(toDate);
@@ -120,10 +116,10 @@ public class BookingService {
         BookingResponse response = new BookingResponse();
         response.setId(booking.getId());
         response.setUserId(booking.getUserId());
-        response.setResourceId(booking.getResource().getId());
-        response.setResourceName(booking.getResource().getName());
-        response.setResourceType(booking.getResource().getType());
-        response.setResourceLocation(booking.getResource().getLocation());
+        response.setResourceId(booking.getResourceId());
+        response.setResourceName(booking.getResourceName());
+        response.setResourceType("Resource");
+        response.setResourceLocation(booking.getResourceLocation());
         response.setStatus(booking.getStatus());
         response.setPurpose(booking.getPurpose());
 

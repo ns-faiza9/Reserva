@@ -1,4 +1,4 @@
-import { signinApi, signupApi, fetchUserInfo, setToken, clearAuth, getToken } from './api';
+import { signinApi, signupApi, fetchUserInfo, logoutApi, setToken, clearAuth, getToken } from './api';
 
 export const signup = async (formData) => {
   const res = await signupApi({
@@ -26,7 +26,15 @@ export const login = async (email, password) => {
   return null;
 };
 
-export const logout = () => clearAuth();
+export const logout = async () => {
+  try {
+    await logoutApi();
+  } catch {
+    // Ignore server-side logout errors; still clear local auth state.
+  } finally {
+    clearAuth();
+  }
+};
 
 export const isAuthenticated = () => !!getToken();
 

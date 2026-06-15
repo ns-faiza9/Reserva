@@ -14,12 +14,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByResourceIdAndBookingDate(Long resourceId, LocalDate bookingDate);
 
-    @Query("SELECT b FROM Booking b WHERE b.resource.id = :resourceId AND b.bookingDate = :bookingDate AND b.timeSlot.id = :timeSlotId AND b.status != 'CANCELLED'")
+    @Query("SELECT b FROM Booking b WHERE b.resourceId = :resourceId AND b.bookingDate = :bookingDate AND b.timeSlot.id = :timeSlotId AND b.status != 'CANCELLED'")
     List<Booking> findConflictingBookings(@Param("resourceId") Long resourceId, @Param("bookingDate") LocalDate bookingDate, @Param("timeSlotId") Long timeSlotId);
 
     List<Booking> findByUserId(String userId);
 
-    @Query("SELECT b FROM Booking b WHERE b.resource.id = :resourceId AND b.status != 'CANCELLED'")
+    @Query("SELECT b FROM Booking b WHERE b.resourceId = :resourceId AND b.status != 'CANCELLED'")
     List<Booking> findActiveByResourceId(@Param("resourceId") Long resourceId);
 
 }

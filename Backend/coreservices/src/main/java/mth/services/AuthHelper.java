@@ -1,5 +1,7 @@
 package mth.services;
 
+import mth.config.ForbiddenException;
+import mth.config.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +15,7 @@ public class AuthHelper {
         try {
             return jwtService.validateJWT(token).get("username").toString();
         } catch (Exception e) {
-            throw new RuntimeException("Invalid token");
+            throw new UnauthorizedException("Invalid or expired token");
         }
     }
 
@@ -21,13 +23,13 @@ public class AuthHelper {
         try {
             return ((Number) jwtService.validateJWT(token).get("role")).intValue();
         } catch (Exception e) {
-            throw new RuntimeException("Invalid token");
+            throw new UnauthorizedException("Invalid or expired token");
         }
     }
 
     public void requireAdmin(String token) {
         if (roleFromToken(token) != 2) {
-            throw new RuntimeException("Admin access required");
+            throw new ForbiddenException("Admin access required");
         }
     }
 }

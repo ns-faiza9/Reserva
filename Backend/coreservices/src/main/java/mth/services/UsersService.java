@@ -65,4 +65,17 @@ public class UsersService {
         }
         return response;
     }
+
+    public Map<String, Object> logout(String token) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            jwtService.revokeJWT(token);
+            response.put("code", 200);
+            response.put("message", "Logged out successfully");
+        } catch (Exception e) {
+            response.put("code", 401);
+            response.put("message", e.getMessage());
+        }
+        return response;
+    }
 }

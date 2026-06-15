@@ -42,7 +42,15 @@ const Navbar = () => {
             <NavLink to="/profile" style={linkStyle} title="Profile">
               <div className="nav-avatar"><User size={18} /></div>
             </NavLink>
-            <button type="button" className="btn-nav-logout" onClick={() => { logout(); toast.success('Logged out successfully'); navigate('/'); }}>
+            <button
+              type="button"
+              className="btn-nav-logout"
+              onClick={async () => {
+                await logout();
+                toast.success('Logged out successfully');
+                navigate('/');
+              }}
+            >
               <LogOut size={16} /> Log Out
             </button>
           </>

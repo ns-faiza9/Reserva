@@ -3,6 +3,7 @@ package mth.services;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,9 @@ import java.util.Map;
 public class JwtService {
     private final String secret = "ReservaDBDFinalProjectSecretKey2026SecureTokenSigning";
     private final SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     public String generateJWT(Object username, Object role) {
         Map<String, Object> payload = new HashMap<>();
@@ -28,6 +32,9 @@ public class JwtService {
     }
 
     public Map<String, Object> validateJWT(String token) throws Exception {
+        if (tokenBlacklistService.isRevoked(token)) {
+            throw new Exception("Token revoked");
+        }
         Claims claims = Jwts.parser().verifyWith(key).build()
                 .parseSignedClaims(token).getPayload();
         Date expiration = claims.getExpiration();
@@ -38,5 +45,11 @@ public class JwtService {
         payload.put("username", claims.get("username"));
         payload.put("role", claims.get("role"));
         return payload;
+    }
+
+    public void revokeJWT(String token) throws Exception {
+        Claims claims = Jwts.parser().verifyWith(key).build()
+                .parseSignedClaims(token).getPayload();
+        tokenBlacklistService.revoke(token, claims.getExpiration());
     }
 }
